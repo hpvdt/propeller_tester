@@ -19,7 +19,11 @@ const byte thrDisp = 3;
 // Temporary variables for data from encoders (to avoid interrupts changing them)
 float rpm, power, torque, thrust;
 
-const unsigned int startPause = 10; // Pause from power on to calibration (seconds)
+// Rolling Average Variables
+const byte numberOfSamplesNeeded = 10;
+byte currentSample = 0;
+const int samplePeriod = 100; // Period between sampling in ms
+float rpmC, powerC, torqueC, thrustC; // Store cummulation of the samples for averaging later
 
 void setup() {
   Serial.begin(115200); // Setup serial first
@@ -31,33 +35,55 @@ void setup() {
   setupEncoders();
 
   Serial.println(F("Propeller tester set up. YOU MAY START THE MOTOR.\n"));
-  
   Serial.println("\nRPM | TORQUE | POWER | THRUST"); // Data headers
   
-  delay(5000);
+  delay(5000); // Brief delay to show header info before datastream
 }
 
 
 void loop() {
 
-  thrust = updateThrust();
-  
   // Get encoder dependant variables in quick succession
   rpm = rotationalPeriod;
   torque = findTorque();
+  thrust = updateThrust();
   
+  // Update cummulated results
+  torqueC = torqueC + torque;
+  thrustC = thrustC + thrust;
   rpm = 6283185.3 / rpm; // Convert rotational period (us) to rate (rad/s)
-  power = torque * rpm;
-  rpm = 9.549296586 * rpm; // Convert rad/s to RPM
+  rpmC = rpmC + rpm;
+
+  currentSample++;
+
+  // Have we collected enough samples?
+  if (currentSample >= numberOfSamplesNeeded) {
+    
+    // Determine average of all readings
+    torque = torqueC / currentSample;
+    thrust = thrustC / currentSample;
+    rpm = rpmC / currentSample; // Note: this is still in rad/s
+    
+    power = torque * rpm; // Get average power
+    
+    rpm = 9.549296586 * rpm; // Convert rad/s to RPM
+    
+    // Update displayed values
+    displayFloat(rpm,rpmDisp,2);
+    displayFloat(power,powDisp,2);
+    displayFloat(torque,torDisp,2);
+    displayFloat(thrust,thrDisp,2);
+
+    outputDataSerial();
+
+    // Reset values for next sample cycle
+    currentSample = 0;
+    torqueC = 0.0;
+    thrustC = 0.0;
+    rpmC = 0.0;
+  }
   
-  // Update displayed values
-  displayFloat(rpm,rpmDisp,2);
-  displayFloat(power,powDisp,2);
-  displayFloat(torque,torDisp,2);
-  displayFloat(thrust,thrDisp,2);
-  
-  outputDataSerial();
-  delay(25);
+  delay(samplePeriod);
 }
 
 void outputDataSerial() {
