@@ -49,10 +49,10 @@ void propInterrupt() {
 }
 
 float findTorque() {
+  // torque = theta * J * Shear Modulus / length
+  const float JmOverLength = Jm / shaftLength;
+  
   float workingPhase = phase; // Avoid issues from an updated phase value
-  float output = workingPhase;
 
-  // Do some math here, get equations later
-
-  return output;
+  return (workingPhase * JmOverLength);
 }
