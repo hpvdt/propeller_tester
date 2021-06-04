@@ -27,3 +27,4 @@ Once the system is properly calibrated as per the previous section, the system i
 ## TODO
 - [ ] Make the outputs be the result of a rolling average of recent values 
 - [ ] Test all the code in the final assembly
+- [ ] Add formula to properly convert shaft twist angle (phase) to shaft torque
