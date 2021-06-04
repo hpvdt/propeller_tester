@@ -25,5 +25,4 @@ The system stores configuration parameters internally on the microcontroller's E
 Once the system is properly calibrated as per the previous section, the system is operated by uploading the `propeller_tester` sketch. It will read in the calibration data stored in EEPROM and run without user intervention. **It will broadcast information over serial at a baudrate of 115200**. *NOTE: It is recommended that the system be powered on before the propeller starts spinning.*
 
 ## TODO
-- [ ] Make the outputs be the result of a rolling average of recent values 
 - [ ] Test all the code in the final assembly
