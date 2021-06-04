@@ -1,26 +1,27 @@
 #include <EEPROM.h> //Needed to record user settings
 
+////////////////////////////////
+// Calibration configuration
+const int samplesNeeded = 1000; // Samples that will be collected before an average is found
+const int updateSpacing = 100; // Update the user every so often with progress
+const unsigned int holdOffPeriod = 10000; // Holdoff after successive encoder events
+const int PHASE_DIFF_LOCATION = 20; // Location of phase difference in EEPROM
+
 // Encoder pins
 const byte motorEnc = 2;
 const byte propEnc = 3;
 
 // Constants
-unsigned long steadyStatePhaseDif = 0; // Radians times 1000, set once in setup
 const byte numberTicks = 2; // Number of encoder pulses per rotation
-const unsigned int holdOffPeriod = 10000; // Holdoff after successive events
-const int PHASE_DIFF_LOCATION = 20; // Location of phase difference in EEPROM
 
 // Variables used in interrupts
-volatile unsigned long motorSideLast, propSideLast;
+volatile unsigned long motorSideLast, propSideLast; // Record previous interrupt times
 volatile unsigned long rotationalPeriod = 100000000; // Rotational period (times 1000) in us
-volatile float phase; // Phase in radians
 
-
-////////////////////////////////
-// Calibration configuration
-const int sampleCount = 1000;
+// Calibration variables
 int samplesTaken = 0;
-
+unsigned long cummulativeTotal = 0;
+int updateMarker = updateSpacing; // Marker for when to output next progress update
 
 void setup() {
   Serial.begin(9600);
@@ -29,28 +30,71 @@ void setup() {
   pinMode(motorEnc, INPUT);
   pinMode(propEnc, INPUT);
 
-  Serial.println("HPVDT Propeller Shaft Phase Calibration");
-  Serial.println("Allow shaft to reach steady state speed, UNLOADED\n");
-  Serial.println("When steady-state is reached, send any character to begin calibration");
+  Serial.println(F("HPVDT Propeller Shaft Phase Calibration"));
+  Serial.println(F("Allow shaft to reach steady state speed, UNLOADED\n"));
+  Serial.println(F("When steady-state is reached, send any character to begin calibration\n"));
 
   // Wait for data to continue
   while (Serial.available()) Serial.read(); //Clear anything in RX buffer
   while (Serial.available() == 0) delay(10); //Wait for user to press key
   while (Serial.available()) Serial.read(); //Clear anything in RX buffer
-  
+
+  // Inform user of configuration
+  Serial.print(F("STARTING CALIBRATION. "));
+  Serial.print(samplesNeeded);
+  Serial.println(F(" samples will be averaged."));
+
+  // Attach interrupts for encoders
   attachInterrupt(digitalPinToInterrupt(motorEnc), motorInterrupt, RISING);
   attachInterrupt(digitalPinToInterrupt(propEnc), propInterrupt, RISING);
 }
 
 void loop() {
-
-  if (samplesTaken == sampleCount) {
+  
+  // Wait until the required number of samples are acquired
+  if (samplesTaken >= samplesNeeded) {
+    // Disable any interrupts
     detachInterrupt(digitalPinToInterrupt(motorEnc));
     detachInterrupt(digitalPinToInterrupt(propEnc));
+
+    // Calculated average and store it to EEPROM
+    cummulativeTotal = cummulativeTotal / samplesTaken;
+    EEPROM.put(PHASE_DIFF_LOCATION, cummulativeTotal);
+
+    // Inform user of completion and results
+    Serial.println(F("Complete calibration cycle!"));
+    Serial.print(F("Collected "));
+    Serial.print(samplesTaken);
+    Serial.print(F(" samples, average phase of "));
+    Serial.print(float(cummulativeTotal)/1000.0, 4);
+    Serial.println(F(" radians recorded."));
+    Serial.print(F("Result saved to EEPROM at address "));
+    Serial.println(PHASE_DIFF_LOCATION);
+
+    Serial.println("\nCalibration complete, please reprogram with testing program.");
+    Serial.println("System will now quit.");  
+
+    while(1) {
+      delay(1000); // Hold microcontroller here until restarted/reprogrammed
+    }
   }
 
+  // Provide update to user periodically
+  if (samplesTaken >= updateMarker) {
+    Serial.print(F("Completed "));
+    Serial.print(samplesTaken);
+    Serial.print(F(" / "));
+    Serial.println(samplesNeeded);
+
+    updateMarker = updateSpacing + updateMarker; // Move to next increment
+  }
+
+  delay(1);
 }
 
+
+// Interrupts are basically the same as the actual tester code.
+// Just some minor additioons to increment the cummulative sum and sample count.
 
 void motorInterrupt() {
   unsigned long temp = micros();
@@ -82,8 +126,8 @@ void propInterrupt() {
   temp = propSideLast - motorSideLast;
   temp = temp * 1000;
   temp = temp / rotationalPeriod;
-  temp = temp - steadyStatePhaseDif;
-  phase = temp / 1000.0;
 
+  // Increase cumulative total and sample count
+  cummulativeTotal = cummulativeTotal + temp; 
   samplesTaken++;
 }
