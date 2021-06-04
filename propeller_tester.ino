@@ -17,7 +17,7 @@ const byte powDisp = 2;
 const byte thrDisp = 3;
 
 // Temporary variables for data from encoders (to avoid interrupts changing them)
-float rpm, power, torque;
+float rpm, power, torque, thrust;
 
 const unsigned int startPause = 10; // Pause from power on to calibration (seconds)
 
@@ -25,24 +25,22 @@ void setup() {
   Serial.begin(115200); // Setup serial first
 
   Serial.println(F("HPVDT Propeller Test Rig"));
-  Serial.println(F("AXLE MUST BE STATIONARY FOR CALIBRATION"));
-  Serial.print(F("You have "));
-  Serial.print(startPause);
-  Serial.println(F(" seconds to stop it before calibration begins.\n"));
-  delay(startPause * 1000);
-  Serial.println(F("STARTING CALIBRATIONS. AXLE SHOULD BE STILL!\n"));
 
   setupLoadCell();
   displaySetup();
   setupEncoders();
 
   Serial.println(F("Propeller tester set up. YOU MAY START THE MOTOR.\n"));
+  
+  Serial.println("\nRPM | TORQUE | POWER | THRUST"); // Data headers
+  
+  delay(5000);
 }
 
 
 void loop() {
 
-  updateThrust();
+  thrust = updateThrust();
   
   // Get encoder dependant variables in quick succession
   rpm = rotationalPeriod;
