@@ -4,8 +4,8 @@
 
 void setupEncoders() {
   // Set up encoders for use
-  pinMode(motorEnc, INPUT);
-  pinMode(propEnc, INPUT);
+  pinMode(motorEnc, INPUT_PULLUP);
+  pinMode(propEnc, INPUT_PULLUP);
 
   attachInterrupt(digitalPinToInterrupt(motorEnc), motorInterrupt, RISING);
   attachInterrupt(digitalPinToInterrupt(propEnc), propInterrupt, RISING);
@@ -27,7 +27,7 @@ void propInterrupt() {
   unsigned long temp = micros();
 
   // Exit if there is too soon of a repetition
-  if (holdOffPeriod > (temp - motorSideLast)) {
+  if (holdOffPeriod > (temp - propSideLast)) {
     return;  
   }
 
