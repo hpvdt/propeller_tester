@@ -26,3 +26,4 @@ Once the system is properly calibrated as per the previous section, the system i
 
 ## TODO
 - [ ] Test all the code in the final assembly
+- [ ] Add in length of shaft monitored https://github.com/hpvdt/propeller_tester/blob/0df63888690b3bbc69b2ddcbe8b33027cc562e70/propeller_tester/encoder.h#L5
