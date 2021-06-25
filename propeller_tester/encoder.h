@@ -12,7 +12,7 @@ const byte motorEnc = 2;                // Pin for motor side encoder
 const byte propEnc = 3;                 // Pin for propeller end encoder
 unsigned long steadyStatePhaseDif = 0;  // Radians times 1000, set once in setup
 const int PHASE_DIFF_LOCATION = 20;     // Location of phase difference in EEPROM
-const byte numberTicks = 2;             // Number of encoder pulses per rotation
+const byte numberTicks = 1;             // Number of encoder pulses per rotation
 const unsigned int holdOffPeriod = 10000; // Holdoff after successive events (us)
 
 // Variables used in interrupts
