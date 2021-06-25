@@ -37,7 +37,7 @@ void setup() {
   Serial.println(F("Propeller tester set up. YOU MAY START THE MOTOR.\n"));
   Serial.println("\nRPM | TORQUE | POWER | THRUST"); // Data headers
   
-  delay(5000); // Brief delay to show header info before datastream
+  delay(1000); // Brief delay to show header info before datastream
 }
 
 
