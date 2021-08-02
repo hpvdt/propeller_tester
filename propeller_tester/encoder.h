@@ -2,7 +2,7 @@
 
 // Shaft Constants
 const float Jm = 57.9402017;    // J * Shear Modulus (Nm^2)
-const float shaftLength = 0.315;  // Shaft length in meters
+const float shaftLength = 0.475;  // Shaft length in meters
 // Jm needs to be precalculated since using a large range of numbers can lead
 // to inacccurate results on microcontrollers. J is generally on the order of
 // 10^10 while J is 10^-9, shaft length and phase are around 10^0.
