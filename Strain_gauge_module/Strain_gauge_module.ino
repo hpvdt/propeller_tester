@@ -43,7 +43,7 @@ void loop() {
     digitalWrite(ledPin, LOW); // LED OFF
   }
 
-  if (ack == 1) {
+  if (ack == 123) {
     sensorValue = gauge.get_value(40);
     sensorValue = sensorValue/10;
     Serial.write(byte(sensorValue>>24));
@@ -59,5 +59,14 @@ void loop() {
     delay(50);
     digitalWrite(ledPin, LOW); // LED OFF
     ack = 0;
+    delay(500);
   }
+  else{clear_serial(); }
   }
+
+
+void clear_serial(){
+  while (Serial.available() > 0){
+    char t = Serial.read();
+  }
+}
