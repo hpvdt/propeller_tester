@@ -4,18 +4,14 @@ long int read_strain_gauge() {
   
       long int sensorValue;
       
-      BTSerial.write(1);
-      delay(250);
-     
+      BTSerial.write(123);
+      delay(100);
       wait();
       sensorValue = BTSerial.read();
-      
       wait();
       sensorValue = (sensorValue<<8)|BTSerial.read();
-      
       wait();
       sensorValue = (sensorValue<<8)|BTSerial.read();
-      
       wait();
       sensorValue = (sensorValue<<8)|BTSerial.read();
 
@@ -24,7 +20,7 @@ long int read_strain_gauge() {
 }
 
 void wait(){
-      while (BTSerial.available() == 0){
+      while (BTSerial.available() == 0 && counter <= timeout){
       counter ++;
       delay(10);
       }

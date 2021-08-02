@@ -50,7 +50,6 @@ void loop() {
     Serial.write(byte(sensorValue>>16));
     Serial.write(byte(sensorValue>>8));
     Serial.write(byte(sensorValue));
-    Serial.flush();
     digitalWrite(ledPin, HIGH); // LED ON
     delay(50);
     digitalWrite(ledPin, LOW); // LED OFF
@@ -59,7 +58,7 @@ void loop() {
     delay(50);
     digitalWrite(ledPin, LOW); // LED OFF
     ack = 0;
-    delay(500);
+    Serial.flush();
   }
   else{clear_serial(); }
   }
