@@ -5,6 +5,7 @@ long int read_strain_gauge() {
       long int sensorValue;
       
       BTSerial.write(1);
+      delay(250);
      
       wait();
       sensorValue = BTSerial.read();
