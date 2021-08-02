@@ -33,7 +33,7 @@ void setup() {
   Serial.println(F("HPVDT Propeller Test Rig"));
 
   setupLoadCell();
-  displaySetup();
+  //displaySetup();
   setupEncoders();
 
   Serial.println(F("Propeller tester set up. YOU MAY START THE MOTOR.\n"));
@@ -71,10 +71,10 @@ void loop() {
     rpm = 9.549296586 * rpm; // Convert rad/s to RPM
     
     // Update displayed values
-    displayFloat(rpm,rpmDisp,2);
-    displayFloat(power,powDisp,2);
-    displayFloat(float(torque),torDisp,2);
-    displayFloat(thrust,thrDisp,2);
+    //displayFloat(rpm,rpmDisp,2);
+    //displayFloat(power,powDisp,2);
+    //displayFloat(float(torque),torDisp,2);
+    //displayFloat(thrust,thrDisp,2);
 
     outputDataSerial();
 
