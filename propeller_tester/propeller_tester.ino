@@ -22,9 +22,9 @@ float rpm, power,thrust;
 long int torque;
 
 // Rolling Average Variables
-const byte numberOfSamplesNeeded = 10;
+const byte numberOfSamplesNeeded = 1;
 byte currentSample = 0;
-const int samplePeriod = 100; // Period between sampling in ms
+const int samplePeriod = 500; // Period between sampling in ms
 float rpmC, powerC, torqueC, thrustC; // Store cummulation of the samples for averaging later
 
 void setup() {

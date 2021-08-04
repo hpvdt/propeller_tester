@@ -59,10 +59,9 @@ void loop() {
     digitalWrite(ledPin, LOW); // LED OFF
     ack = 0;
     Serial.flush();
+    clear_serial();
   }
-  else{clear_serial(); }
-  }
-
+}
 
 void clear_serial(){
   while (Serial.available() > 0){
