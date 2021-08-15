@@ -22,7 +22,8 @@ void setup() {
   gauge.begin(5,6);
   gauge.set_gain(64);
   gauge.set_scale();
-  gauge.tare();
+  gauge.tare(40);
+  torqueZero = gauge.get_value(40);
   for (int i =1; i<=3;i++){
     digitalWrite(ledPin, HIGH); // LED ON
     delay(100);
@@ -45,7 +46,7 @@ void loop() {
 
   if (ack == 123) {
     sensorValue = gauge.get_value(40);
-    sensorValue = sensorValue/10;
+    sensorValue = (sensorValue-torqueZero)/10;
     Serial.write(byte(sensorValue>>24));
     Serial.write(byte(sensorValue>>16));
     Serial.write(byte(sensorValue>>8));
