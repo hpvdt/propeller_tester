@@ -24,7 +24,7 @@ long int torque;
 // Rolling Average Variables
 byte currentSample = 0;
 const int samplePeriod = 500; // Period between sampling in ms
-float rpmC, powerC, torqueC, thrustC; // Store cummulation of the samples for averaging later
+float rpmC, powerC, torqueC, thrustC, torqueF;// Store cummulation of the samples for averaging later
 
 void setup() {
   BTSerial.begin(9600);
@@ -46,11 +46,11 @@ void loop() {
   // Get encoder dependant variables in quick succession
   rpm = rotationalPeriod;
   torque = read_strain_gauge();
-  torque = torque/5681.82;//Strain gauge factor
+  torqueF = torque/5681.82;//Strain gauge factor
   thrust = updateThrust();
   // Update cummulated results
   rpm = 6283185.3 / rpm; // Convert rotational period (us) to rate (rad/s)
-  power = torque * rpm; // Get average power
+  power = torqueF * rpm; // Get average power
   rpm = 9.549296586 * rpm; // Convert rad/s to RPM
 
   outputDataSerial();
@@ -62,7 +62,7 @@ void outputDataSerial() {
   // Output data over serial
   Serial.print(rpm, 2);
   Serial.write('\t');
-  Serial.print(torque);
+  Serial.print(torqueF);
   Serial.write('\t');
   Serial.print(power, 2);
   Serial.write('\t');
