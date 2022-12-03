@@ -22,10 +22,9 @@ float rpm, power,thrust;
 long int torque;
 
 // Rolling Average Variables
-const byte numberOfSamplesNeeded = 10;
 byte currentSample = 0;
-const int samplePeriod = 100; // Period between sampling in ms
-float rpmC, powerC, torqueC, thrustC; // Store cummulation of the samples for averaging later
+const int samplePeriod = 500; // Period between sampling in ms
+float rpmC, powerC, torqueC, thrustC, torqueF;// Store cummulation of the samples for averaging later
 
 void setup() {
   BTSerial.begin(9600);
@@ -33,7 +32,6 @@ void setup() {
   Serial.println(F("HPVDT Propeller Test Rig"));
 
   setupLoadCell();
-  displaySetup();
   setupEncoders();
 
   Serial.println(F("Propeller tester set up. YOU MAY START THE MOTOR.\n"));
@@ -48,42 +46,14 @@ void loop() {
   // Get encoder dependant variables in quick succession
   rpm = rotationalPeriod;
   torque = read_strain_gauge();
+  torqueF = torque/5681.82;//Strain gauge factor
   thrust = updateThrust();
-  
   // Update cummulated results
- // torqueC = torqueC + torque;
-  thrustC = thrustC + thrust;
   rpm = 6283185.3 / rpm; // Convert rotational period (us) to rate (rad/s)
-  rpmC = rpmC + rpm;
+  power = torqueF * rpm; // Get average power
+  rpm = 9.549296586 * rpm; // Convert rad/s to RPM
 
-  currentSample++;
-
-  // Have we collected enough samples?
-  if (currentSample >= numberOfSamplesNeeded) {
-    
-    // Determine average of all readings
-    //torque = torqueC / currentSample;
-    thrust = thrustC / currentSample;
-    rpm = rpmC / currentSample; // Note: this is still in rad/s
-    
-    power = torque * rpm; // Get average power
-    
-    rpm = 9.549296586 * rpm; // Convert rad/s to RPM
-    
-    // Update displayed values
-    displayFloat(rpm,rpmDisp,2);
-    displayFloat(power,powDisp,2);
-    displayFloat(float(torque),torDisp,2);
-    displayFloat(thrust,thrDisp,2);
-
-    outputDataSerial();
-
-    // Reset values for next sample cycle
-    currentSample = 0;
-    torqueC = 0.0;
-    thrustC = 0.0;
-    rpmC = 0.0;
-  }
+  outputDataSerial();
   
   delay(samplePeriod);
 }
@@ -92,7 +62,7 @@ void outputDataSerial() {
   // Output data over serial
   Serial.print(rpm, 2);
   Serial.write('\t');
-  Serial.print(torque);
+  Serial.print(torqueF);
   Serial.write('\t');
   Serial.print(power, 2);
   Serial.write('\t');

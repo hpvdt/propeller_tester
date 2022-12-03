@@ -62,7 +62,12 @@ float updateThrust() {
   //    return(loadCell.getWeight());
   //  }
 
-  return (-(loadCell.getWeight()));
+  float newThrust;
+
+  for(int i = 1; i <= 10; i ++){
+    newThrust = newThrust +loadCell.getWeight();
+  }
+  return (-(newThrust/10));
 }
 
 void recordSystemSettings(void) {

@@ -1,31 +1,25 @@
-int counter = 0;
-int timeout = 300;
+int counter_gauge = 0;
+int timeout = 400;
+
 long int read_strain_gauge() {
-  
       long int sensorValue;
-      
-      BTSerial.write(1);
-      delay(250);
-     
+      counter_gauge = 0;
+      clear_serial();
+      BTSerial.write(123);
       wait();
       sensorValue = BTSerial.read();
-      
       wait();
       sensorValue = (sensorValue<<8)|BTSerial.read();
-      
       wait();
       sensorValue = (sensorValue<<8)|BTSerial.read();
-      
       wait();
       sensorValue = (sensorValue<<8)|BTSerial.read();
-
-      clear_serial();
       return sensorValue;
 }
 
 void wait(){
-      while (BTSerial.available() == 0){
-      counter ++;
+      while (BTSerial.available() < 1  && counter_gauge <= timeout){
+      counter_gauge ++;
       delay(10);
       }
 }
