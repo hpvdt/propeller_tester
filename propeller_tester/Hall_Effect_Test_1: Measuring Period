@@ -1,0 +1,64 @@
+// C++ code
+
+const int ledPin = 8;   //ledPin
+const int interruptPin = 2; //Button to perform interrupt
+
+// Tracking ticks
+const byte numTicks = 3;
+volatile byte currentTick = 0; // Stores current tick
+volatile byte previousTick = 1; // Stores previous tick
+
+// variables to keep track of the timing of recent interrupts
+
+unsigned long timeNow = 0; 
+volatile int timeBetween[numTicks]; // Period = time between each tick
+volatile bool print_time_between = false;
+volatile long timeLast = 1000;
+volatile long period = 0;
+
+void magnetPassed(){
+
+  // Set time
+  timeNow = millis();
+
+  
+  timeBetween[currentTick] = timeNow - timeLast; // Assign time between ticks to array
+  period = timeBetween[currentTick];
+  timeLast = timeNow;
+  currentTick ++; // update tick index
+  print_time_between = true;
+
+  // Resets ticks
+  if(currentTick == numTicks){
+    currentTick = 0;
+ 
+  }
+}
+void setup()
+{
+  // Reset times for all array members
+  for (byte j = 0; j < numTicks; j++){
+    timeBetween[j] = 0;
+  }
+  
+ //Set pins
+ pinMode(ledPin, OUTPUT);
+ pinMode(interruptPin, INPUT_PULLUP);
+ Serial.begin(9600);
+ attachInterrupt(digitalPinToInterrupt(interruptPin), magnetPassed, RISING);
+ 
+}
+
+ void loop(){
+
+  // If stops turning, RPM set back to 0
+ 
+  
+  if (print_time_between == true){
+    Serial.println("Current tick:");
+    Serial.print(currentTick);
+    Serial.println("Time between ticks:");
+    Serial.print(period);
+    print_time_between = false;
+  }
+}
